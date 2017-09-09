@@ -1,0 +1,9 @@
+{
+  "globals": {
+    "document": true
+  },
+  "extends": "airbnb",
+  "rules": {
+    "jsx-a11y/href-no-hash": "off"
+  }
+}
