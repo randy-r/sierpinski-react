@@ -3,11 +3,12 @@ import { interpolateInferno } from 'd3-scale';
 import { scaleQuantize } from 'd3';
 
 const MAX_RECURSION_LIMIT = 6;
-const totalTriangles =
+const MAX_POSSIBLE_TRIANGLES =
   [...Array(MAX_RECURSION_LIMIT).keys()]
     .map(i => 3 ** i)
-    .reduce((a, b) => a + b); // (3 ** (MAX_RECURSION_LIMIT));
-const colorDenominator = totalTriangles;
+    .reduce((a, b) => a + b);
+const colorDenominator = MAX_POSSIBLE_TRIANGLES;
+let crtRecursionLimitTotalTriangles = 0;
 let crtTotalTriangles = 0;
 
 const InnerLines = ({ triangle, crtRecDepth, recursionLimit, trianglesLimit }) => {
@@ -46,7 +47,7 @@ class InitialTriangle extends React.Component {
   constructor(props) {
     super(props);
     this.state = { recursionLimit: 1, trianglesLimit: 1 };
-    this.side = 400;
+    this.side = 600;
     this.height = (Math.cos(Math.PI / 6) * this.side);
   }
 
@@ -62,11 +63,16 @@ class InitialTriangle extends React.Component {
       .range([...Array(MAX_RECURSION_LIMIT + 1).keys()]);
 
     const mapYFunc = scaleQuantize()
-      .domain([0, this.height])
-      .range([...Array(totalTriangles + 1).keys()]);
+      .domain([20, this.height])
+      .range([...Array(crtRecursionLimitTotalTriangles + 1).keys()].reverse());
 
     const newRecursionLimit = mapXFunc(x);
     const newTrianglesLimit = mapYFunc(y);
+
+    crtRecursionLimitTotalTriangles = newRecursionLimit === 0 ? 0 :
+      [...Array(newRecursionLimit).keys()]
+        .map(i => 3 ** i)
+        .reduce((a, b) => a + b);
 
     crtTotalTriangles = 0;
     this.setState({ recursionLimit: newRecursionLimit, trianglesLimit: newTrianglesLimit });
@@ -77,9 +83,9 @@ class InitialTriangle extends React.Component {
     const side = this.side;
     const height = this.height;
     const initialTriangle = {
-      A: { x: 0, y: height },
-      B: { x: side, y: height },
-      C: { x: side / 2, y: 0 },
+      A: { x: 0, y: 10 + height },
+      B: { x: side, y: 10 + height },
+      C: { x: side / 2, y: 10 },
     };
     const { A, B, C } = initialTriangle;
     const pathData = `M${A.x} ${A.y} L${B.x} ${B.y} L${C.x} ${C.y} Z`;
@@ -89,7 +95,7 @@ class InitialTriangle extends React.Component {
         onMouseMove={this.handleMouseMove}
         width={side}
         height={height}
-        viewBox={`0 0 ${side + 10} ${height}`}
+        viewBox={`0 0 ${side + 10} ${height + 10}`}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path d={pathData} fill="none" stroke="none" />
@@ -104,7 +110,12 @@ class InitialTriangle extends React.Component {
   }
 }
 
-const App = () => <InitialTriangle />;
+const style = {
+  margin: '0 auto',
+  width: '600px',
+};
+
+const App = () => <div style={style}> <InitialTriangle /></div>;
 
 
 export default App;
