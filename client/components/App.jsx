@@ -1,5 +1,6 @@
 import React from 'react';
 import { interpolateInferno } from 'd3-scale';
+import { scaleQuantize } from 'd3';
 
 const MAX_RECURSION_LIMIT = 6;
 const totalTriangles =
@@ -43,19 +44,31 @@ class InitialTriangle extends React.Component {
   constructor(props) {
     super(props);
     this.state = { recursionLimit: 1 };
+    this.side = 400;
+    this.height = (Math.cos(Math.PI / 6) * this.side);
   }
 
   handleMouseMove = (event) => {
+    if (this.inProgress) return;
+    this.inProgress = true;
     const bcr = this.svg.getBoundingClientRect();
     const x = event.pageX - bcr.left;
     const y = event.pageY - bcr.top;
+
+    const mapXFunc = scaleQuantize()
+      .domain([0, this.side])
+      .range([...Array(MAX_RECURSION_LIMIT + 1).keys()]);
+
+    const newRecursionLimit = mapXFunc(x);
+
     crtTotalTriangles = 0;
-    this.setState({ recursionLimit: this.state.recursionLimit + 1 });
+    this.setState({ recursionLimit: newRecursionLimit });
+    this.inProgress = false;
   }
 
   render() {
-    const side = 400;
-    const height = (Math.cos(Math.PI / 6) * side);
+    const side = this.side;
+    const height = this.height;
     const initialTriangle = {
       A: { x: 0, y: height },
       B: { x: side, y: height },
@@ -66,7 +79,7 @@ class InitialTriangle extends React.Component {
     return (
       <svg
         ref={(el) => { this.svg = el; }}
-        onClick={this.handleMouseMove}
+        onMouseMove={this.handleMouseMove}
         width={side}
         height={height}
         viewBox={`0 0 ${side + 10} ${height}`}

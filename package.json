@@ -41,6 +41,7 @@
     "webpack-dev-server": "^2.7.1"
   },
   "dependencies": {
+    "d3": "^4.10.2",
     "d3-scale": "^1.0.6",
     "react": "^15.6.1",
     "react-dom": "^15.6.1"
