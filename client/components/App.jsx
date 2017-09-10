@@ -10,8 +10,10 @@ const totalTriangles =
 const colorDenominator = totalTriangles;
 let crtTotalTriangles = 0;
 
-const InnerLines = ({ triangle, crtRecDepth, recursionLimit }) => {
-  if (crtRecDepth >= MAX_RECURSION_LIMIT || crtRecDepth >= recursionLimit) {
+const InnerLines = ({ triangle, crtRecDepth, recursionLimit, trianglesLimit }) => {
+  if (crtRecDepth >= MAX_RECURSION_LIMIT
+    || crtRecDepth >= recursionLimit
+    || crtTotalTriangles >= trianglesLimit) {
     return null;
   }
 
@@ -33,9 +35,9 @@ const InnerLines = ({ triangle, crtRecDepth, recursionLimit }) => {
   return (
     <g >
       <path d={pathData} fill={color} stroke="none" />
-      <InnerLines triangle={triangleA} crtRecDepth={newRecDepth} recursionLimit={recursionLimit} />
-      <InnerLines triangle={triangleB} crtRecDepth={newRecDepth} recursionLimit={recursionLimit} />
-      <InnerLines triangle={triangleC} crtRecDepth={newRecDepth} recursionLimit={recursionLimit} />
+      <InnerLines triangle={triangleA} crtRecDepth={newRecDepth} recursionLimit={recursionLimit} trianglesLimit={trianglesLimit} />
+      <InnerLines triangle={triangleB} crtRecDepth={newRecDepth} recursionLimit={recursionLimit} trianglesLimit={trianglesLimit} />
+      <InnerLines triangle={triangleC} crtRecDepth={newRecDepth} recursionLimit={recursionLimit} trianglesLimit={trianglesLimit} />
     </g>
   );
 };
@@ -43,7 +45,7 @@ const InnerLines = ({ triangle, crtRecDepth, recursionLimit }) => {
 class InitialTriangle extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { recursionLimit: 1 };
+    this.state = { recursionLimit: 1, trianglesLimit: 1 };
     this.side = 400;
     this.height = (Math.cos(Math.PI / 6) * this.side);
   }
@@ -59,10 +61,15 @@ class InitialTriangle extends React.Component {
       .domain([0, this.side])
       .range([...Array(MAX_RECURSION_LIMIT + 1).keys()]);
 
+    const mapYFunc = scaleQuantize()
+      .domain([0, this.height])
+      .range([...Array(totalTriangles + 1).keys()]);
+
     const newRecursionLimit = mapXFunc(x);
+    const newTrianglesLimit = mapYFunc(y);
 
     crtTotalTriangles = 0;
-    this.setState({ recursionLimit: newRecursionLimit });
+    this.setState({ recursionLimit: newRecursionLimit, trianglesLimit: newTrianglesLimit });
     this.inProgress = false;
   }
 
@@ -90,6 +97,7 @@ class InitialTriangle extends React.Component {
           triangle={initialTriangle}
           crtRecDepth={0}
           recursionLimit={this.state.recursionLimit}
+          trianglesLimit={this.state.trianglesLimit}
         />
       </svg>
     );
