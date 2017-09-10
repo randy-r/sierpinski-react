@@ -1,11 +1,20 @@
 import React from 'react';
+import { interpolateInferno } from 'd3-scale';
 
-const RECCURSION_LIMIT = 4;
+const RECCURSION_LIMIT = 6;
+const totalTriangles =
+  [...Array(RECCURSION_LIMIT).keys()]
+    .map(i => 3 ** i)
+    .reduce((a, b) => a + b); // (3 ** (RECCURSION_LIMIT));
+const colorDenominator = totalTriangles;
+let crtTotalTriangles = 0;
 
 const InnerLines = ({ triangle, crtReccDepth }) => {
   if (crtReccDepth >= RECCURSION_LIMIT) {
     return null;
   }
+
+  crtTotalTriangles += 1;
 
   const { A, B, C } = triangle;
   // compute midpoints of triangle's sides
@@ -17,12 +26,15 @@ const InnerLines = ({ triangle, crtReccDepth }) => {
   const triangleA = { A, B: L, C: N };
   const triangleB = { A: L, B, C: M };
   const triangleC = { A: N, B: M, C };
+
+  const newReccDepth = crtReccDepth + 1;
+  const color = interpolateInferno(crtTotalTriangles / colorDenominator);
   return (
     <g >
-      <path d={pathData} fill="none" stroke="blue" />
-      <InnerLines triangle={triangleA} crtReccDepth={crtReccDepth + 1} />
-      <InnerLines triangle={triangleB} crtReccDepth={crtReccDepth + 1} />
-      <InnerLines triangle={triangleC} crtReccDepth={crtReccDepth + 1} />
+      <path d={pathData} fill={color} stroke="none" />
+      <InnerLines triangle={triangleA} crtReccDepth={newReccDepth} />
+      <InnerLines triangle={triangleB} crtReccDepth={newReccDepth} />
+      <InnerLines triangle={triangleC} crtReccDepth={newReccDepth} />
     </g>
   );
 };
@@ -39,7 +51,7 @@ const InitialTriangle = () => {
   const pathData = `M${A.x} ${A.y} L${B.x} ${B.y} L${C.x} ${C.y} Z`;
   return (
     <svg width={side} height={height} viewBox={`0 0 ${side + 10} ${height}`} xmlns="http://www.w3.org/2000/svg">
-      <path d={pathData} fill="none" stroke="red" />
+      <path d={pathData} fill="none" stroke="none" />
       <InnerLines triangle={initialTriangle} crtReccDepth={0} />
     </svg>
   );
