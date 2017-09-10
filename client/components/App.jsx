@@ -8,9 +8,9 @@ const InnerLines = ({ triangle, crtReccDepth }) => {
   }
 
   const { A, B, C } = triangle;
-  const side = B.x - A.x;
-  const L = { x: ((B.x - A.x) / 2) + A.x, y: A.y };
-  const M = { x: ((B.x - C.x) / 2) + (side / 2) + A.x, y: ((B.y - C.y) / 2) + C.y };
+  // compute midpoints of triangle's sides
+  const L = { x: ((B.x - A.x) / 2) + A.x, y: ((B.y - A.y) / 2) + A.y };
+  const M = { x: ((B.x - C.x) / 2) + C.x, y: ((B.y - C.y) / 2) + C.y };
   const N = { x: ((C.x - A.x) / 2) + A.x, y: ((A.y - C.y) / 2) + C.y };
 
   const pathData = `M${L.x} ${L.y} L${M.x} ${M.y} L${N.x} ${N.y} Z`;
