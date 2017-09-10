@@ -3,6 +3,7 @@
     "document": true
   },
   "extends": "airbnb",
+  "parser": "babel-eslint",
   "rules": {
     "jsx-a11y/href-no-hash": "off",
     "react/prop-types": 0
