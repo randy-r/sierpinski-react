@@ -6,6 +6,7 @@
   "parser": "babel-eslint",
   "rules": {
     "jsx-a11y/href-no-hash": "off",
-    "react/prop-types": 0
+    "react/prop-types": 0,
+    "react/jsx-max-props-per-line": [2, { "maximum": 3, "when": "multiline" }]
   }
 }
