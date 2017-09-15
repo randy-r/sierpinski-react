@@ -48,8 +48,6 @@ class SierpinskiTriangle extends React.Component {
   constructor(props) {
     super(props);
     this.state = { recursionLimit: 1, trianglesLimit: 1 };
-    this.side = 600;
-    this.height = (Math.cos(Math.PI / 6) * this.side);
   }
 
   handleMouseMove = (event) => {
@@ -60,11 +58,11 @@ class SierpinskiTriangle extends React.Component {
     const y = event.pageY - bcr.top;
 
     const mapXFunc = scaleQuantize()
-      .domain([0, this.side])
+      .domain([0, this.props.width])
       .range([...Array(MAX_RECURSION_LIMIT + 1).keys()]);
 
     const mapYFunc = scaleQuantize()
-      .domain([20, this.height])
+      .domain([20, this.props.height])
       .range([...Array(crtRecursionLimitTotalTriangles + 1).keys()].reverse());
 
     const newRecursionLimit = mapXFunc(x);
@@ -81,22 +79,19 @@ class SierpinskiTriangle extends React.Component {
   }
 
   render() {
-    const side = this.side;
-    const height = this.height;
-    const initialTriangle = {
-      A: { x: 0, y: 10 + height },
-      B: { x: side, y: 10 + height },
-      C: { x: side / 2, y: 10 },
-    };
+    const width = this.props.width;
+    const height = this.props.height;
+    const initialTriangle = this.props.initialTriangle;
+
     const { A, B, C } = initialTriangle;
     const pathData = `M${A.x} ${A.y} L${B.x} ${B.y} L${C.x} ${C.y} Z`;
     return (
       <svg
         ref={(el) => { this.svg = el; }}
         onMouseMove={this.handleMouseMove}
-        width={side}
+        width={width}
         height={height}
-        viewBox={`0 0 ${side + 10} ${height + 10}`}
+        viewBox={`0 0 ${width + 10} ${height + 10}`}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path d={pathData} fill="none" stroke="none" />
